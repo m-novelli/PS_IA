@@ -1,0 +1,25 @@
+# Dados brutos e processados
+data/raw/
+data/interim/
+data/processed/
+
+# Artefatos de modelo
+models/
+*.pkl
+*.joblib
+
+# Ambiente virtual
+.venv/
+__pycache__/
+*.pyc
+
+# Arquivos temporários
+*.log
+.DS_Store
+
+# Notebooks convertidos
+.ipynb_checkpoints/
+
+# Configs locais
+.env
+data/raw/
