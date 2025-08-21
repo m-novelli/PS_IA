@@ -1,0 +1,60 @@
+{
+  "NUM_CANDIDATES": [
+    "formacao_e_idiomas.ano_conclusao",
+    "infos_basicas.codigo_profissional"
+  ],
+  "CAT_CANDIDATES": [
+    "informacoes_basicas.empresa_divisao",
+    "informacoes_basicas.vaga_sap"
+  ],
+  "TXT_CANDIDATES": [
+    "beneficios.valor_venda",
+    "comentario",
+    "cv_pt",
+    "data_candidatura",
+    "informacoes_basicas.analista_responsavel",
+    "informacoes_basicas.cliente",
+    "informacoes_basicas.data_requicisao",
+    "informacoes_basicas.limite_esperado_para_contratacao",
+    "informacoes_basicas.requisitante",
+    "informacoes_basicas.solicitante_cliente",
+    "informacoes_basicas.titulo_vaga",
+    "informacoes_pessoais.download_cv",
+    "informacoes_profissionais.titulo_profissional",
+    "nome_candidato",
+    "perfil_vaga.areas_atuacao",
+    "perfil_vaga.bairro",
+    "perfil_vaga.cidade",
+    "perfil_vaga.competencia_tecnicas_e_comportamentais",
+    "perfil_vaga.demais_observacoes",
+    "perfil_vaga.equipamentos_necessarios",
+    "perfil_vaga.estado",
+    "perfil_vaga.faixa_etaria",
+    "perfil_vaga.habilidades_comportamentais_necessarias",
+    "perfil_vaga.local_trabalho",
+    "perfil_vaga.nivel profissional",
+    "perfil_vaga.nivel_academico",
+    "perfil_vaga.nivel_espanhol",
+    "perfil_vaga.nivel_ingles",
+    "perfil_vaga.outro_idioma",
+    "perfil_vaga.principais_atividades",
+    "perfil_vaga.regiao",
+    "perfil_vaga.vaga_especifica_para_pcd",
+    "perfil_vaga.viagens_requeridas",
+    "recrutador",
+    "titulo_vaga",
+    "ultima_atualizacao"
+  ],
+  "EXCLUDE": [
+    "codigo_applicant",
+    "codigo_vaga",
+    "situacao_candidato",
+    "status_simplificado",
+    "target_triagem"
+  ],
+  "fallback_used": false,
+  "params": {
+    "CATEGORICAL_MAX_UNIQUE": 50,
+    "MAX_MISSING_RATIO": 0.98
+  }
+}

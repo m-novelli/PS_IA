@@ -43,7 +43,7 @@ def load_prospects(path: Path) -> pd.DataFrame:
 # =====================
 # CARREGAMENTO E FLATTEN
 # =====================
-print("🔄 Carregando bases...")
+print("Carregando bases...")
 vagas = load_dict_json_flat(RAW_DIR / "vagas.json", "codigo_vaga")
 applicants = load_dict_json_flat(RAW_DIR / "applicants.json", "codigo_applicant")
 prospects = load_prospects(RAW_DIR / "prospects.json")
@@ -51,19 +51,19 @@ prospects = load_prospects(RAW_DIR / "prospects.json")
 # =====================
 # MERGE FINAL
 # =====================
-print("🔗 Realizando merges...")
+print(" Realizando merges...")
 vagas_com_prospects = vagas.merge(prospects, on="codigo_vaga", how="left")
 df_total = vagas_com_prospects.merge(applicants, on="codigo_applicant", how="left", suffixes=("", "_applicant"))
 
-print(f"✅ df_total gerado com shape: {df_total.shape}")
+print(f" df_total gerado com shape: {df_total.shape}")
 
 # =====================
 # SALVAMENTO
 # =====================
 output_path = PROCESSED_DIR / "df_total.parquet"
 df_total.to_parquet(output_path, index=False)
-print(f"💾 Arquivo salvo em: {output_path}")
+print(f" Arquivo salvo em: {output_path}")
 
 output_csv = PROCESSED_DIR / "df_total.csv"
 df_total.to_csv(output_csv, index=False)
-print(f"📄 CSV salvo em: {output_csv}")
+print(f" CSV salvo em: {output_csv}")
