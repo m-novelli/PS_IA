@@ -1,7 +1,8 @@
 # Dados brutos e processados
 data/raw/
+data/processed/*
+!data/processed/feature_map.json
 data/interim/
-data/processed/
 
 # Artefatos de modelo
 models/
