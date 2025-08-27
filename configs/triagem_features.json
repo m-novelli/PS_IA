@@ -4,6 +4,9 @@
     "cargo_atual.email_superior_imediato",
     "cargo_atual.nome_superior_imediato",
     "cargo_atual.projeto_atual",
+    "cv_en",
+    "informacoes_profissionais.experiencias",
+    "informacoes_profissionais.qualificacoes",
     "match_nivel_academico",
     "overlap_skills",
     "sim_cv_vaga"
@@ -68,10 +71,6 @@
     "perfil_vaga.principais_atividades"
   ],
   "EXCLUDE": [
-    "informacoes_basicas.telefone",
-    "informacoes_pessoais.fonte_indicacao",
-    "infos_basicas.inserido_por",
-    "infos_basicas.sabendo_de_nos_por",
     "situacao_candidato",
     "status_simplificado",
     "target_triagem"

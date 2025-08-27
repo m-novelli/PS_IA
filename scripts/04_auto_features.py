@@ -46,6 +46,9 @@ print(f"Resumo salvo em: {SUM_OUT}")
 # ===================== Classificação de features =====================
 cols = set(df.columns)
 
+for key in fmap:
+    fmap[key] = [col for col in fmap[key] if col in cols]
+
 exclude = set(
     fmap.get("id", [])
     + fmap.get("target", [])

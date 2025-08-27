@@ -96,7 +96,6 @@ fmap = load_feature_map(FEATURE_MAP_PATH)
 # "target": ["status_simplificado", "target_triagem", "target_contratacao"]
 cols_to_remove = (
     fmap.get("id", [])
-    + fmap.get("target", [])
     + fmap.get("date", [])
     + fmap.get("personal_info", [])
     + fmap.get("leakage_risk", [])

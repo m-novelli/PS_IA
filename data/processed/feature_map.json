@@ -23,14 +23,11 @@
 
   "text": [
     "cv_pt",
-    "cv_en",
     "comentario",
     "perfil_vaga.principais_atividades",
     "perfil_vaga.competencia_tecnicas_e_comportamentais",
     "perfil_vaga.demais_observacoes",
-    "infos_basicas.objetivo_profissional",
-    "informacoes_profissionais.qualificacoes",
-    "informacoes_profissionais.experiencias"
+    "infos_basicas.objetivo_profissional"
   ],
 
   "personal_info": [

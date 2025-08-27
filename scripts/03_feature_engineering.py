@@ -95,6 +95,11 @@ def main():
 
     # ========== Salvar ==========
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    # Recarrega coluna de target da base original, caso necessário
+    df_target = pd.read_csv(BASE_DIR / "data" / "processed" / "dataset_triagem_clean.csv", usecols=["target_triagem"])
+    df["target_triagem"] = df_target["target_triagem"]
+
+
     df.to_csv(OUTPUT, index=False)
     print(f"Arquivo salvo: {OUTPUT} | Shape final: {df.shape}")
 
