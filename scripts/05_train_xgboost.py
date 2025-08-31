@@ -1,10 +1,11 @@
+# scripts/train_xgboost.py
 from pathlib import Path
 import json
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GroupShuffleSplit
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import classification_report, roc_auc_score, average_precision_score, f1_score
 from xgboost import XGBClassifier
@@ -15,6 +16,7 @@ from xgboost import XGBClassifier
 BASE_DIR = Path(__file__).resolve().parents[1]
 DATASET = BASE_DIR / "data" / "processed" / "dataset_triagem_fe.csv"
 CONFIG = BASE_DIR / "configs" / "triagem_features.json"
+FEATURE_MAP = BASE_DIR / "data" / "processed" / "feature_map.json"
 
 # ================================
 # Carregamento
@@ -28,35 +30,37 @@ cat_cols = features["CAT_CANDIDATES"]
 txt_cols = features["TXT_CANDIDATES"]
 target_col = "target_triagem"
 
-# Verifica colunas ausentes
-all_used_cols = num_cols + cat_cols + txt_cols
-missing = [col for col in all_used_cols if col not in df.columns]
-if missing:
-    print(f"\u26a0\ufe0f Colunas ausentes na base e ignoradas: {missing}")
-
-print(f"\nBase: {df.shape} | Target: {target_col}")
-print("Numéricas:", num_cols)
-print("Categóricas:", cat_cols)
-print("Texto:", txt_cols)
-
 # ================================
 # Prepara X e y
 # ================================
-X = df[[col for col in all_used_cols if col in df.columns]].copy()
+all_used_cols = num_cols + cat_cols + txt_cols
+X = df[[c for c in all_used_cols if c in df.columns]].copy()
 y = df[target_col]
 
-# Remove colunas inválidas
+# remove colunas inválidas
 invalid_cols = X.columns[(X.nunique(dropna=True) <= 1) | (X.isna().mean() == 1.0)]
 if len(invalid_cols):
     print("Removendo colunas inválidas:", list(invalid_cols))
     X = X.drop(columns=invalid_cols)
+    num_cols = [c for c in num_cols if c in X.columns]
+    cat_cols = [c for c in cat_cols if c in X.columns]
+    txt_cols = [c for c in txt_cols if c in X.columns]
 
 # ================================
-# Split
+# Split com grupos
 # ================================
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, stratify=y, test_size=0.2, random_state=42
-)
+with open(FEATURE_MAP, "r", encoding="utf-8") as f:
+    fmap = json.load(f)
+
+group_cols = [c for c in fmap.get("group", []) if c in df.columns]
+if not group_cols:
+    raise RuntimeError("Nenhuma coluna de grupo encontrada no dataset.")
+
+groups = df[group_cols[0]].values
+splitter = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+tr_idx, te_idx = next(splitter.split(X, y, groups=groups))
+X_train, X_test = X.iloc[tr_idx].copy(), X.iloc[te_idx].copy()
+y_train, y_test = y.iloc[tr_idx], y.iloc[te_idx]
 
 # ================================
 # Texto: combina colunas
@@ -75,15 +79,19 @@ else:
 # ================================
 # Pré-processamento
 # ================================
-transformers = [
-    ("num", StandardScaler(), [c for c in num_cols if c in X_train.columns]),
-    ("cat", OneHotEncoder(handle_unknown="ignore"), [c for c in cat_cols if c in X_train.columns]),
-]
-
-if txt_input:
-    transformers.append(("txt", TfidfVectorizer(max_features=1000), txt_input))
+transformers = []
+if num_cols: transformers.append(("num", "passthrough", num_cols))  # XGBoost não precisa de scaler
+if cat_cols: transformers.append(("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols))
+if txt_input: transformers.append(("txt", TfidfVectorizer(max_features=1000), txt_input))
 
 preprocessor = ColumnTransformer(transformers=transformers)
+
+# ================================
+# Calcula scale_pos_weight dinamicamente
+# ================================
+neg, pos = (y_train == 0).sum(), (y_train == 1).sum()
+scale_pos_weight = neg / pos
+print(f"scale_pos_weight calculado: {scale_pos_weight:.3f} (neg={neg}, pos={pos})")
 
 # ================================
 # Pipeline com XGBoost
@@ -91,13 +99,13 @@ preprocessor = ColumnTransformer(transformers=transformers)
 model = Pipeline(steps=[
     ("pre", preprocessor),
     ("clf", XGBClassifier(
-        n_estimators=100,
+        n_estimators=300,           # mais robusto que 100
         max_depth=6,
         learning_rate=0.1,
         objective="binary:logistic",
-        eval_metric="logloss",
+        eval_metric=["logloss", "auc", "aucpr"],
         use_label_encoder=False,
-        scale_pos_weight=1.5,  # ajustar com base no balanceamento
+        scale_pos_weight=scale_pos_weight,
         random_state=42,
         n_jobs=-1
     ))
@@ -119,4 +127,3 @@ print(classification_report(y_test, y_pred, digits=3))
 print("ROC AUC:", round(roc_auc_score(y_test, y_proba), 3))
 print("Average Precision (PR AUC):", round(average_precision_score(y_test, y_proba), 3))
 print("F1 Score:", round(f1_score(y_test, y_pred), 3))
-

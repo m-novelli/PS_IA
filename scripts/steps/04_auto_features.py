@@ -3,7 +3,7 @@ import json
 import pandas as pd
 
 # ===================== Caminhos =====================
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]
 CSV_IN = BASE_DIR / "data" / "processed" / "dataset_triagem_fe.csv"
 FEATURE_MAP = BASE_DIR / "data" / "processed" / "feature_map.json"
 CFG_OUT = BASE_DIR / "configs" / "triagem_features.json"
@@ -54,6 +54,7 @@ exclude = set(
     + fmap.get("target", [])
     + fmap.get("date", [])
     + fmap.get("personal_info", [])
+    + fmap.get("group", [])
     + fmap.get("leakage_risk", [])
 )
 exclude = exclude & cols  # Garante que estão na base

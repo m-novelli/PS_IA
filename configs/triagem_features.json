@@ -71,6 +71,8 @@
     "perfil_vaga.principais_atividades"
   ],
   "EXCLUDE": [
+    "codigo_applicant",
+    "codigo_vaga",
     "situacao_candidato",
     "status_simplificado",
     "target_triagem"

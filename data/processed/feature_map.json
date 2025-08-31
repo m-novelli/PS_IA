@@ -1,10 +1,12 @@
 {
   "id": [
-    "codigo_vaga",
-    "codigo_applicant",
     "informacoes_pessoais.cpf",
     "infos_basicas.codigo_profissional",
     "cargo_atual.id_ibrati"
+  ],
+  "group": [
+    "codigo_vaga",
+    "codigo_applicant"
   ],
 
   "date": [

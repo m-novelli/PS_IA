@@ -1,8 +1,13 @@
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import json
+import re
+import unicodedata
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import normalize
 
 # ==== Stopwords em português com fallback se não estiverem disponíveis ====
 import nltk
@@ -17,16 +22,13 @@ except LookupError:
 # ================================
 # Caminhos
 # ================================
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]
 INPUT = BASE_DIR / "data" / "processed" / "dataset_triagem_clean.csv"
 OUTPUT = BASE_DIR / "data" / "processed" / "dataset_triagem_fe.csv"
 
 # ================================
 # Utilitários de texto
 # ================================
-import re
-import unicodedata
-
 def normalize_text(s):
     """Minimiza e remove acentuação e pontuação."""
     s = str(s).lower().strip()
@@ -42,11 +44,6 @@ def jaccard_overlap(text1, text2):
         return 0.0
     return len(set1 & set2) / len(set1 | set2)
 
-def cosine_sim(text1, text2, vectorizer):
-    """Calcula similaridade cosseno entre dois textos."""
-    vecs = vectorizer.transform([normalize_text(text1), normalize_text(text2)])
-    return cosine_similarity(vecs[0], vecs[1])[0][0]
-
 # ================================
 # Pipeline principal
 # ================================
@@ -55,7 +52,19 @@ def main():
     df = pd.read_csv(INPUT)
     print(f"Base carregada: {df.shape}")
 
-    # Verificação de colunas obrigatórias
+    # === Carrega feature_map para preservar grupos/targets no output ===
+    fmap_path = BASE_DIR / "data" / "processed" / "feature_map.json"
+    fmap = {}
+    if fmap_path.exists():
+        fmap = json.loads(fmap_path.read_text(encoding="utf-8"))
+    group_cols = [c for c in fmap.get("group", ["codigo_vaga", "codigo_applicant"]) if c in df.columns]
+    target_cols = [c for c in fmap.get("target", ["target_triagem", "status_simplificado", "target_contratacao"]) if c in df.columns]
+
+    assert len(target_cols) > 0, "Nenhuma coluna de target encontrada no INPUT."
+    # escolha um target principal (prioridade para target_triagem)
+    target_main = next((c for c in ["target_triagem", "status_simplificado", "target_contratacao"] if c in target_cols), target_cols[0])
+
+    # Verificação de colunas obrigatórias de FE
     required_cols = [
         "perfil_vaga.nivel_academico",
         "formacao_e_idiomas.nivel_academico",
@@ -65,43 +74,57 @@ def main():
         "perfil_vaga.principais_atividades"
     ]
     missing_cols = [col for col in required_cols if col not in df.columns]
-    assert not missing_cols, f"Colunas ausentes: {missing_cols}"
+    if missing_cols:
+        raise ValueError(f"Colunas obrigatórias ausentes: {missing_cols}")
 
-    # ========== 1. Match direto de nível acadêmico ==========
+    # ========== 1) Match direto de nível acadêmico ==========
     df["match_nivel_academico"] = (
         df["perfil_vaga.nivel_academico"].fillna("").str.lower().str.strip() ==
         df["formacao_e_idiomas.nivel_academico"].fillna("").str.lower().str.strip()
     ).astype(int)
 
-    # ========== 2. Overlap de competências exigidas x oferecidas ==========
+    # ========== 2) Overlap de competências exigidas x oferecidas ==========
     df["overlap_skills"] = df.apply(lambda row: jaccard_overlap(
         row.get("perfil_vaga.competencia_tecnicas_e_comportamentais", ""),
         row.get("informacoes_profissionais.conhecimentos_tecnicos", "")
     ), axis=1)
 
-    # ========== 3. Similaridade textual entre CV e atividades da vaga ==========
-    textos_comb = (
-        df["cv_pt"].fillna("").astype(str) + " " +
-        df["perfil_vaga.principais_atividades"].fillna("").astype(str)
-    )
+    # ========== 3) Similaridade textual CV vs atividades da vaga (batch) ==========
+    cv_series   = df["cv_pt"].fillna("").astype(str).map(normalize_text)
+    vaga_series = df["perfil_vaga.principais_atividades"].fillna("").astype(str).map(normalize_text)
+
     vectorizer = TfidfVectorizer(stop_words=STOPWORDS_PT, max_features=1000)
-    vectorizer.fit(textos_comb)
+    # Ajusta no corpus conjunto para ter vocabulário de ambos
+    vectorizer.fit(pd.concat([cv_series, vaga_series], axis=0))
 
-    df["sim_cv_vaga"] = df.apply(lambda row: cosine_sim(
-        row.get("cv_pt", ""),
-        row.get("perfil_vaga.principais_atividades", ""),
-        vectorizer
-    ), axis=1)
+    X_cv   = vectorizer.transform(cv_series)
+    X_vaga = vectorizer.transform(vaga_series)
 
-    # ========== Salvar ==========
+    # TF-IDF já é L2-normalizado por padrão, mas normalizamos explicitamente
+    X_cv_n   = normalize(X_cv, norm="l2", copy=False)
+    X_vaga_n = normalize(X_vaga, norm="l2", copy=False)
+
+    # Similaridade coseno linha a linha (sparse)
+    df["sim_cv_vaga"] = (X_cv_n.multiply(X_vaga_n)).sum(axis=1).A1
+
+    # ========== Monta o output ==========
+    keep_always = list({target_main, *group_cols})
+    fe_cols = ["match_nivel_academico", "overlap_skills", "sim_cv_vaga"]
+
+    out_cols = list(df.columns)
+    for c in fe_cols:
+        if c not in out_cols:
+            out_cols.append(c)
+
+    # sanity: grupo/target presentes
+    assert any(c in out_cols for c in group_cols), f"Coluna(s) de grupo ausente(s) no output: {group_cols}"
+    assert target_main in out_cols, f"Target {target_main} ausente no output."
+
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    # Recarrega coluna de target da base original, caso necessário
-    df_target = pd.read_csv(BASE_DIR / "data" / "processed" / "dataset_triagem_clean.csv", usecols=["target_triagem"])
-    df["target_triagem"] = df_target["target_triagem"]
+    df[out_cols].to_csv(OUTPUT, index=False)
+    print(f"Arquivo salvo: {OUTPUT} | Shape final: {df[out_cols].shape}")
+    print(f"[OK] Grupo(s) no output: {group_cols} | Target principal: {target_main}")
 
-
-    df.to_csv(OUTPUT, index=False)
-    print(f"Arquivo salvo: {OUTPUT} | Shape final: {df.shape}")
 
 if __name__ == "__main__":
     main()
