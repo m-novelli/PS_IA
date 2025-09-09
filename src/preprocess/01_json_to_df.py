@@ -3,10 +3,10 @@ import pandas as pd
 from pathlib import Path
 
 # Diretórios
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]
 RAW_DIR = BASE_DIR / "data" / "raw"
-PROCESSED_DIR = BASE_DIR / "data" / "processed"
-PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+INTERIM_DIR = BASE_DIR / "data" / "interim"
+INTERIM_DIR.mkdir(parents=True, exist_ok=True)
 
 # =====================
 # FUNÇÕES AUXILIARES
@@ -60,10 +60,10 @@ print(f" df_total gerado com shape: {df_total.shape}")
 # =====================
 # SALVAMENTO
 # =====================
-output_path = PROCESSED_DIR / "df_total.parquet"
+output_path = INTERIM_DIR / "df_total.parquet"
 df_total.to_parquet(output_path, index=False)
 print(f" Arquivo salvo em: {output_path}")
 
-output_csv = PROCESSED_DIR / "df_total.csv"
+output_csv = INTERIM_DIR / "df_total.csv"
 df_total.to_csv(output_csv, index=False)
 print(f" CSV salvo em: {output_csv}")

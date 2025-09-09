@@ -27,7 +27,7 @@ expected_keys = {
 }
 missing_keys = expected_keys - fmap.keys()
 if missing_keys:
-    print(f"\n⚠️ Atenção: as seguintes chaves estão ausentes do feature_map: {missing_keys}")
+    print(f"\n Atenção: as seguintes chaves estão ausentes do feature_map: {missing_keys}")
 
 # ===================== Gera resumo para auditoria =====================
 summary = []
@@ -77,7 +77,7 @@ all_mapped = exclude | set(cat) | set(txt) | set(num)
 unmapped = sorted(cols - all_mapped)
 
 if unmapped:
-    print("\n⚠️ Colunas não mapeadas no feature_map e não classificadas automaticamente:")
+    print("\n Colunas não mapeadas no feature_map e não classificadas automaticamente:")
     print(unmapped)
 
 # ===================== Salva config final =====================

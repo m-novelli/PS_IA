@@ -13,7 +13,7 @@ def load_feature_map(path: Path) -> dict:
 # ================================
 # Caminhos
 # ================================
-CSV_IN = Path("data/processed/df_total.csv")
+CSV_IN = Path("data/interim/df_total.csv")
 BASE_DIR = CSV_IN.parent  # data/processed
 
 FEATURE_MAP_PATH = BASE_DIR.parent / "processed" / "feature_map.json"
@@ -92,8 +92,6 @@ print("Proporção de target_triagem == 1:", round(df_triagem["target_triagem"].
 # ================================
 fmap = load_feature_map(FEATURE_MAP_PATH)
 
-# ⚠️ Se desejar, inclua no JSON:
-# "target": ["status_simplificado", "target_triagem", "target_contratacao"]
 cols_to_remove = (
     fmap.get("id", [])
     + fmap.get("date", [])

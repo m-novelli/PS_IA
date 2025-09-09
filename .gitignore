@@ -8,6 +8,8 @@ data/interim/
 models/
 *.pkl
 *.joblib
+mlruns/
+
 
 # Ambiente virtual
 .venv/
