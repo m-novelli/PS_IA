@@ -6,3 +6,5 @@ scikit-learn
 xgboost
 joblib
 mlflow
+openai
+requests
