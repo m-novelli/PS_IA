@@ -1,13 +1,25 @@
-# api/main.py
+# app/main.py
 from fastapi import FastAPI
-from . import routes
 from fastapi.responses import RedirectResponse
+from . import routes  # app.routes
+
+TAGS_METADATA = [
+    {"name": "Health",  "description": "Sinalização e metadados do modelo/artefatos."},
+    {"name": "Schema",  "description": "Esquema de entrada aceito pela API (somente colunas **cat/txt**)."},
+    {"name": "Predict", "description": "Predição para 1 item."},
+    {"name": "Ranking", "description": "Ranking de candidatos por vaga + (opcional) perguntas."},
+]
 
 def create_app() -> FastAPI:
     app = FastAPI(
         title="Triagem de Candidatos - API",
-        version="1.0.0",
-        description="API para predição de avanço de candidatos para próximas fases."
+        version="2.0.0",
+        description=(
+            "API de scoring/triagem. **Atenção**: o modelo consome **apenas** as colunas cruas "
+            "especificadas em `/schema` (categorias e textos). As features numéricas são "
+            "geradas internamente no pipeline."
+        ),
+        openapi_tags=TAGS_METADATA,
     )
 
     @app.on_event("startup")
@@ -18,7 +30,6 @@ def create_app() -> FastAPI:
 
     @app.get("/", include_in_schema=False)
     def root():
-        # redireciona para as docs
         return RedirectResponse(url="/docs")
 
     return app

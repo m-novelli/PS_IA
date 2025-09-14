@@ -3,24 +3,21 @@ import pandas as pd
 import json
 
 # ================================
+# Caminhos 
+# ================================
+BASE_DIR = Path(__file__).resolve().parents[2]
+
+CSV_IN            = BASE_DIR / "data" / "interim" / "df_total.csv"
+FEATURE_MAP_PATH  = BASE_DIR / "data" / "processed" / "feature_map.json"
+OUTPUT            = BASE_DIR / "data" / "processed" / "dataset_triagem_clean.csv"
+
+# ================================
 # Função utilitária para o feature_map
 # ================================
 def load_feature_map(path: Path) -> dict:
     assert path.exists(), f"Arquivo não encontrado: {path}"
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
-
-# ================================
-# Caminhos
-# ================================
-CSV_IN = Path("data/interim/df_total.csv")
-BASE_DIR = CSV_IN.parent  # data/processed
-
-FEATURE_MAP_PATH = BASE_DIR.parent / "processed" / "feature_map.json"
-OUT_TRIAGEM = BASE_DIR.parent / "interim" / "dataset_triagem.csv"
-OUT_TRIAGEM_CLEAN = BASE_DIR / "dataset_triagem_clean.csv"
-
-OUT_TRIAGEM.parent.mkdir(parents=True, exist_ok=True)
 
 # ================================
 # Leitura da base consolidada
@@ -71,21 +68,21 @@ print(df["status_simplificado"].value_counts())
 # ================================
 # Remoção de registros iniciais
 # ================================
-iniciais = ["prospect", "inscrito"]
+iniciais = {"prospect", "inscrito"}
 antes = len(df)
 df = df[~df["situacao_candidato"].isin(iniciais)].copy()
 removidos = antes - len(df)
-print(f"\nRegistros removidos por estarem em estágio inicial (Prospect/Inscrito): {removidos}")
+print(f"\nRemovidos por estágio inicial (Prospect/Inscrito): {removidos}")
 
 # ================================
-# Criação do dataset de Triagem
+# Dataset de Triagem + target
 # ================================
 df_triagem = df[df["status_simplificado"] != "vazio"].copy()
 df_triagem["target_triagem"] = df_triagem["status_simplificado"].apply(
-    lambda x: 1 if x in ["contratado", "em_processo"] else 0
+    lambda x: 1 if x in {"contratado", "em_processo"} else 0
 )
 print("\nDataset Triagem:", df_triagem.shape)
-print("Proporção de target_triagem == 1:", round(df_triagem["target_triagem"].mean(), 3))
+print("Proporção target_triagem==1:", round(df_triagem["target_triagem"].mean(), 3))
 
 # ================================
 # Filtro de colunas com base no feature_map.json
@@ -99,24 +96,34 @@ cols_to_remove = (
     + fmap.get("leakage_risk", [])
 )
 
-cols_to_remove_existing = [col for col in cols_to_remove if col in df_triagem.columns]
-cols_not_found = [col for col in cols_to_remove if col not in df_triagem.columns]
+cols_to_remove_existing = [c for c in cols_to_remove if c in df_triagem.columns]
+cols_not_found = [c for c in cols_to_remove if c not in df_triagem.columns]
 
 df_triagem_clean = df_triagem.drop(columns=cols_to_remove_existing)
 
-print(f"\nColunas removidas com base no feature_map ({len(cols_to_remove_existing)}):")
+print(f"\nColunas removidas ({len(cols_to_remove_existing)}):")
 print(cols_to_remove_existing)
-
 if cols_not_found:
-    print(f"Aviso: as seguintes colunas do feature_map não estavam no dataframe e foram ignoradas:\n{cols_not_found}")
+    print(f"Aviso: colunas do feature_map não encontradas (ignoradas): {cols_not_found}")
 
 print("Shape final do dataset limpo:", df_triagem_clean.shape)
 
 # ================================
-# Salvamento dos datasets
+# (Opcional) Checagens que ajudam o treino/serving
 # ================================
-df_triagem.to_csv(OUT_TRIAGEM, index=False)
-print("Arquivo salvo:", OUT_TRIAGEM)
+# Garante que colunas-chave que o pipeline usa tendem a existir
+chaves_recomendadas = [
+    "codigo_vaga",
+    "cv_pt",
+    "perfil_vaga.principais_atividades",
+]
+faltantes = [c for c in chaves_recomendadas if c not in df_triagem_clean.columns]
+if faltantes:
+    print("[AVISO] Colunas recomendadas ausentes (o pipeline lida com faltas, mas pode degradar qualidade):", faltantes)
 
-df_triagem_clean.to_csv(OUT_TRIAGEM_CLEAN, index=False)
-print("Arquivo salvo:", OUT_TRIAGEM_CLEAN)
+# ================================
+# Salvamento
+# ================================
+OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+df_triagem_clean.to_csv(OUTPUT, index=False)
+print("Arquivo salvo:", OUTPUT)
