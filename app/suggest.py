@@ -1,7 +1,7 @@
 # app/suggest.py
 from __future__ import annotations
 from typing import List, Dict, Any
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field
 import os, json, re
 
 # OpenAI SDK
@@ -12,13 +12,16 @@ MAX_JOB_CHARS = int(os.getenv("SUGGEST_MAX_JOB_CHARS", "2000"))
 MAX_CV_CHARS  = int(os.getenv("SUGGEST_MAX_CV_CHARS",  "2000"))
 OPENAI_MODEL  = os.getenv("SUGGEST_MODEL", "gpt-4o-mini")
 
+
 class SuggestQuestionsRequest(BaseModel):
     vaga: Dict[str, str] = Field(..., description="Campos livres: descricao, requisitos, atividades, etc.")
     candidatos: List[Dict[str, str]] = Field(..., description="Lista de dicts com 'external_id' e 'cv' (texto).")
 
+
 class SuggestQuestionsResponse(BaseModel):
     common_questions: List[str]
     per_candidate: Dict[str, List[str]]
+
 
 def _cut(s: str | None, n: int) -> str:
     if not s:
@@ -27,6 +30,7 @@ def _cut(s: str | None, n: int) -> str:
     if len(s) <= n:
         return s
     return s[:n] + "..."
+
 
 def _build_prompt(vaga: Dict[str, str], candidatos: List[Dict[str, str]]) -> str:
     desc = _cut(vaga.get("descricao") or vaga.get("perfil_vaga.principais_atividades") or "", MAX_JOB_CHARS)
@@ -56,6 +60,7 @@ def _build_prompt(vaga: Dict[str, str], candidatos: List[Dict[str, str]]) -> str
     lines.append("Responda apenas com o JSON solicitado. Não inclua explicações adicionais.")
     return "\n".join(lines)
 
+
 def _extract_json(s: str) -> str:
     """
     Se o modelo devolver texto extra, tenta extrair o maior bloco JSON.
@@ -69,8 +74,33 @@ def _extract_json(s: str) -> str:
         return m.group(0)
     return s  # deixa falhar no json.loads para o caller tratar
 
+
 def suggest_questions(req: SuggestQuestionsRequest) -> SuggestQuestionsResponse:
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    testing = os.environ.get("TESTING") == "1"
+    api_key = os.environ.get("OPENAI_API_KEY")
+
+    # modo offline para testes
+    if testing and not api_key:
+        return SuggestQuestionsResponse(
+            common_questions=[
+                "Pergunta simulada comum 1",
+                "Pergunta simulada comum 2",
+                "Pergunta simulada comum 3",
+                "Pergunta simulada comum 4",
+                "Pergunta simulada comum 5",
+            ],
+            per_candidate={
+                str(c.get("external_id", "sem_id")): [
+                    f"Pergunta simulada personalizada 1 para {c.get('external_id', 'sem_id')}",
+                    f"Pergunta simulada personalizada 2 para {c.get('external_id', 'sem_id')}",
+                    f"Pergunta simulada personalizada 3 para {c.get('external_id', 'sem_id')}",
+                ]
+                for c in req.candidatos
+            }
+        )
+
+    # caminho normal (produção)
+    client = OpenAI(api_key=api_key)
     prompt = _build_prompt(req.vaga, req.candidatos)
 
     resp = client.chat.completions.create(

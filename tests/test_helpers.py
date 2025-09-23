@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from api import routes
+from app import routes
 
 def test_coerce_dtypes_numeric_and_text(feature_schema):
     df = pd.DataFrame({
