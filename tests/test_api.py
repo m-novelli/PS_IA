@@ -1,44 +1,39 @@
-def _build_minimal_features(schema: dict) -> dict:
-    feats = {}
-    if schema["num"]:
-        feats[schema["num"][0]] = 30
-    if schema["cat"]:
-        feats[schema["cat"][0]] = "M"
-    if schema["txt"]:
-        feats[schema["txt"][0]] = "analista de dados com python e sql"
-    return feats
+def test_rank_and_suggest(client):
+    payload = {
+        "vaga": {
+            "titulo": "Analista de Dados",
+            "descricao": "Responsável por análises e relatórios."
+        },
+        "candidatos": [
+            {
+                "meta": {"external_id": "cand1"},
+                "candidato": {"nome": "Carlos", "idade": "30", "sexo": "M"}  # idade como string
+            },
+            {
+                "meta": {"external_id": "cand2"},
+                "candidato": {"nome": "Ana", "idade": "25", "sexo": "F"}  # idade como string
+            }
+        ]
+    }
 
-def test_health(client):
-    r = client.get("/health")
-    assert r.status_code == 200
-    body = r.json()
-    assert body["status"] == "ok"
-    assert "artifact" in body
-
-def test_schema(client):
-    r = client.get("/schema")
-    assert r.status_code == 200
-    body = r.json()
-    assert isinstance(body["num"], list)
-    assert "threshold_default" in body
-
-def test_predict_one(client):
-    schema = client.get("/schema").json()
-    payload = {"meta": {"external_id": "abc-123"},
-               "features": _build_minimal_features(schema)}
-    r = client.post("/predict", json=payload)
+    r = client.post("/rank-and-suggest", json=payload)
     assert r.status_code == 200, r.text
-    pred = r.json()["prediction"]
-    assert 0.0 <= pred["prob_next_phase"] <= 1.0
-    assert pred["label"] in (0, 1)
+    body = r.json()
+    assert "results" in body
+    assert len(body["results"]) == 2
 
-def test_predict_batch(client):
-    schema = client.get("/schema").json()
-    payload = {"items": [
-        {"meta": {"external_id": "a"}, "features": _build_minimal_features(schema)},
-        {"meta": {"external_id": "b"}, "features": _build_minimal_features(schema)}
-    ]}
-    r = client.post("/predict-batch", json=payload)
-    assert r.status_code == 200, r.text
-    data = r.json()
-    assert "results" in data and len(data["results"]) == 2
+
+def test_rank_and_suggest_no_candidates(client):
+    payload = {
+        "vaga": {
+            "titulo": "Analista de Dados",
+            "descricao": "Responsável por análises e relatórios."
+        },
+        "candidatos": []  # vazio de propósito
+    }
+
+    r = client.post("/rank-and-suggest", json=payload)
+    assert r.status_code == 400
+    body = r.json()
+    assert "detail" in body
+    assert "nenhum candidato" in body["detail"].lower()

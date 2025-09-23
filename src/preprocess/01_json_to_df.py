@@ -41,29 +41,39 @@ def load_prospects(path: Path) -> pd.DataFrame:
     return pd.DataFrame(flattened)
 
 # =====================
-# CARREGAMENTO E FLATTEN
+# EXECUÇÃO PRINCIPAL
 # =====================
-print("Carregando bases...")
-vagas = load_dict_json_flat(RAW_DIR / "vagas.json", "codigo_vaga")
-applicants = load_dict_json_flat(RAW_DIR / "applicants.json", "codigo_applicant")
-prospects = load_prospects(RAW_DIR / "prospects.json")
+if __name__ == "__main__":
+    print("Carregando bases...")
+    vagas = load_dict_json_flat(RAW_DIR / "vagas.json", "codigo_vaga")
+    applicants = load_dict_json_flat(RAW_DIR / "applicants.json", "codigo_applicant")
+    prospects = load_prospects(RAW_DIR / "prospects.json")
 
-# =====================
-# MERGE FINAL
-# =====================
-print(" Realizando merges...")
-vagas_com_prospects = vagas.merge(prospects, on="codigo_vaga", how="left")
-df_total = vagas_com_prospects.merge(applicants, on="codigo_applicant", how="left", suffixes=("", "_applicant"))
+    print(" Realizando merges...")
+    vagas_com_prospects = vagas.merge(prospects, on="codigo_vaga", how="left")
+    df_total = vagas_com_prospects.merge(
+        applicants,
+        on="codigo_applicant",
+        how="left",
+        suffixes=("", "_applicant")
+    )
 
-print(f" df_total gerado com shape: {df_total.shape}")
+    # ====== limpeza de duplicados ======
+    # mantém apenas uma versão de título e modalidade
+    if "titulo_vaga" in df_total.columns:
+        df_total = df_total.drop(columns=["titulo"], errors="ignore")
+        df_total = df_total.rename(columns={"titulo_vaga": "titulo"})
+    if "modalidade_x" in df_total.columns and "modalidade_y" in df_total.columns:
+        df_total = df_total.drop(columns=["modalidade_y"], errors="ignore")
+        df_total = df_total.rename(columns={"modalidade_x": "modalidade"})
 
-# =====================
-# SALVAMENTO
-# =====================
-output_path = INTERIM_DIR / "df_total.parquet"
-df_total.to_parquet(output_path, index=False)
-print(f" Arquivo salvo em: {output_path}")
+    print(f" df_total gerado com shape: {df_total.shape}")
 
-output_csv = INTERIM_DIR / "df_total.csv"
-df_total.to_csv(output_csv, index=False)
-print(f" CSV salvo em: {output_csv}")
+    # Salvamento
+    output_path = INTERIM_DIR / "df_total.parquet"
+    df_total.to_parquet(output_path, index=False)
+    print(f" Arquivo salvo em: {output_path}")
+
+    output_csv = INTERIM_DIR / "df_total.csv"
+    df_total.to_csv(output_csv, index=False)
+    print(f" CSV salvo em: {output_csv}")
