@@ -1,0 +1,5 @@
+{
+  "n_features": 70,
+  "n_drifted": 40,
+  "drift_rate": 0.5714285714285714
+}

@@ -219,27 +219,7 @@ def predict_one(item: PredictItem, threshold: float = Query(None, ge=0.01, le=0.
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.post("/predict-batch", tags=["Predict"])
-def predict_batch(payload: Dict[str, List[PredictItem]], threshold: float = Query(None, ge=0.01, le=0.99)):
-    items = payload.get("items", [])
-    if not items:
-        raise HTTPException(status_code=400, detail="Nenhum item enviado.")
 
-    thr = float(threshold) if threshold is not None else THRESHOLD_DEFAULT
-    df, _ = _prepare_dataframe(items)
-    proba, label = _predict_df(df, thr)
-
-    results = []
-    for i, item in enumerate(items):
-        results.append({
-            "meta": item.meta or {},
-            "prediction": {
-                "prob_next_phase": float(proba[i]),
-                "label": int(label[i]),
-                "threshold": thr,
-            }
-        })
-    return {"results": results}
 
 @router.post("/rank-and-suggest", response_model=RankAndSuggestResponse, tags=["Ranking"])
 def rank_and_suggest(
