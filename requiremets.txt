@@ -8,3 +8,5 @@ joblib
 mlflow
 openai
 requests
+structlog
+python-json-logger
