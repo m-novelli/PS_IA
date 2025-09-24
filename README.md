@@ -113,7 +113,7 @@ python src/preprocess/02_prepare_triagem.py
 # Certifique-se de que o arquivo dataset_triagem_clean.csv seja gerado em data/processed/
 ```
 
-**Observação para o professor:** Para fins de teste e avaliação, se o arquivo `data/processed/dataset_triagem_clean.csv` já estiver disponível (por exemplo, como `df_total` ou similar), esta etapa pode ser ignorada.
+**Observação:** Para fins de teste e avaliação, se o arquivo `data/processed/dataset_triagem_clean.csv` já estiver disponível (por exemplo, como `df_total` ou similar), esta etapa pode ser ignorada.
 
 #### 2.3. Treinamento do Modelo
 
