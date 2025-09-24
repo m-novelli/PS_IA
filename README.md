@@ -57,7 +57,6 @@ PS_IA-main/
 
 ## ⚙️ Como Rodar o Projeto
 
-Para que o professor possa analisar e executar o projeto, siga os passos abaixo:
 
 ### Pré-requisitos
 
@@ -85,33 +84,53 @@ Para que o professor possa analisar e executar o projeto, siga os passos abaixo:
     ```
     *(Alternativamente, use `python -m venv .venv` e `pip install -r requirements.txt`)*
 
-### 2. Download dos Dados Brutos (Exemplo)
+### 2. Sequência de Execução
 
-Para replicar o ambiente de treinamento, você precisará dos dados. O projeto original usava `curl` para baixar arquivos zip do Google Drive. Adapte conforme a disponibilidade dos dados:
+Para rodar o projeto do zero, siga a sequência de passos abaixo:
+
+#### 2.1. Download dos Dados Brutos (se necessário)
+
+Caso os dados brutos não estejam disponíveis, você pode baixá-los:
 
 ```bash
-# Links para download
+# Exemplo de download 
 curl -L "https://drive.google.com/uc?export=download&id=1h8Lk5LM8VE5TF80mngCcbsQ14qA2rbw_" -o data/raw/vagas.zip
 curl -L "https://drive.google.com/uc?export=download&id=1Z0dOk8FMjazQo03PuUeNGZOW-rxtpzmO" -o data/raw/applicants.zip
 curl -L "https://drive.google.com/uc?export=download&id=1-hNfS7Z01fMM_JnT2K-zQrOoGm_C-jUT" -o data/raw/prospects.zip
-# Descompacte os arquivos e execute os scripts de pré-processamento em src/preprocess/
 ```
 
-### 3. Treinamento do Modelo
+Após o download, descompacte os arquivos zip para o diretório `data/raw/`.
 
-O modelo de Machine Learning é treinado e salvo localmente para ser consumido pela API. Execute o script de treinamento:
+#### 2.2. Pré-processamento dos Dados
+
+Esta etapa é crucial para transformar os dados brutos em um formato utilizável pelo modelo. O script `src/ml/train_pipeline.py` espera o dataset consolidado `dataset_triagem_clean.csv` no diretório `data/processed/`.
+
+Para gerar este arquivo, execute os scripts de pré-processamento na ordem correta. Por exemplo:
+
+```bash
+python src/preprocess/01_json_to_df.py
+python src/preprocess/02_prepare_triagem.py
+# Certifique-se de que o arquivo dataset_triagem_clean.csv seja gerado em data/processed/
+```
+
+**Observação para o professor:** Para fins de teste e avaliação, se o arquivo `data/processed/dataset_triagem_clean.csv` já estiver disponível (por exemplo, como `df_total` ou similar), esta etapa pode ser ignorada.
+
+#### 2.3. Treinamento do Modelo
+
+Com os dados processados disponíveis, o modelo de Machine Learning pode ser treinado e salvo localmente para ser consumido pela API. Execute o script de treinamento:
 
 ```bash
 python src/ml/train_pipeline.py
 ```
 
 Este script irá:
-*   Carregar os dados processados. O script `src/ml/train_pipeline.py` espera o dataset consolidado `dataset_triagem_clean.csv` no diretório `data/processed/`. Para fins de teste e avaliação, se este arquivo já estiver disponível (por exemplo, como `df_total` ou similar), a etapa de pré-processamento pode ser ignorada. Caso contrário, ele deve ser gerado a partir dos dados brutos (`vagas.zip`, `applicants.zip`, `prospects.zip`) utilizando os scripts de pré-processamento em `src/preprocess/` (por exemplo, `01_json_to_df.py` e `02_prepare_triagem.py`).
+*   Carregar o `dataset_triagem_clean.csv` de `data/processed/`.
 *   Construir e treinar um pipeline de ML (XGBoost).
 *   Avaliar o modelo e logar métricas no MLflow (se configurado).
 *   Salvar o modelo treinado (`model.joblib`) e seus metadados (`meta.json`) no diretório `models/prod/`.
 
-### 4. Iniciar a API
+
+### 3. Iniciar a API
 
 Defina as variáveis de ambiente necessárias (especialmente `OPENAI_API_KEY` se for usar a funcionalidade de LLM) e inicie a aplicação FastAPI:
 
