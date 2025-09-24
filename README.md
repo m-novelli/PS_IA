@@ -79,11 +79,12 @@ Para que o professor possa analisar e executar o projeto, siga os passos abaixo:
     ```
 
 3.  **Crie e ative o ambiente virtual e instale as dependências:**
+
     ```bash
 uv sync
 source .venv/bin/activate
     ```
-    
+
     *(Alternativamente, use `python -m venv .venv` e `pip install -r requirements.txt`)*
 
 ### 2. Download dos Dados Brutos
