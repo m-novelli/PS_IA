@@ -8,7 +8,7 @@ import pandas as pd
 import json, os, hashlib, datetime as dt
 
 # (Opcional) OpenAI: geração de perguntas
-from app.suggest import suggest_questions, SuggestQuestionsRequest, SuggestQuestionsResponse
+from .suggest import suggest_questions, SuggestQuestionsRequest, SuggestQuestionsResponse
 
 # Logging estruturado (adição sem alterar a API)
 from .logging_config import logger, safe_hash_obj

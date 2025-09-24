@@ -1,6 +1,7 @@
 # app/main.py
 import os
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from fastapi.responses import RedirectResponse
 from . import routes  # app.routes
 
@@ -20,6 +21,23 @@ MODEL_URI    = os.getenv("MODEL_URI", "N/A")     # ex.: "models:/triagem-candida
 MODEL_RUN_ID = os.getenv("MODEL_RUN_ID", "N/A")  # run_id do MLflow (se disponível)
 MODEL_TAG    = os.getenv("MODEL_TAG", "Production")
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    routes.load_artifacts()
+    # loga um evento de startup com identidade do modelo servido
+    logger.info(
+        "startup",
+        model_uri=MODEL_URI,
+        model_run_id=MODEL_RUN_ID,
+        model_tag=MODEL_TAG,
+        api_version=app.version,
+    )
+    yield
+    # Shutdown (if needed)
+    pass
+
+
 def create_app() -> FastAPI:
     # configurar logging antes de criar o app
     setup_logging()
@@ -31,22 +49,11 @@ def create_app() -> FastAPI:
             "API de Match entre Candidatos para uma Vaga e Geração de Perguntas padronizadas para Entrevista"
         ),
         openapi_tags=TAGS_METADATA,
+        lifespan=lifespan,
     )
 
     # middleware que injeta request_id, mede latência e loga http_request
     app.add_middleware(RequestContextMiddleware)
-
-    @app.on_event("startup")
-    def _load():
-        routes.load_artifacts()
-        # loga um evento de startup com identidade do modelo servido
-        logger.info(
-            "startup",
-            model_uri=MODEL_URI,
-            model_run_id=MODEL_RUN_ID,
-            model_tag=MODEL_TAG,
-            api_version=app.version,
-        )
 
     app.include_router(routes.router, prefix="")
 

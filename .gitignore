@@ -26,3 +26,4 @@ __pycache__/
 # Configs locais
 .env
 data/raw/
+.venv/
