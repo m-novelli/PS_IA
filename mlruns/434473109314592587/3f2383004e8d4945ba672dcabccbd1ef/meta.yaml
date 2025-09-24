@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/mahno/Git/PS_IA/mlruns/434473109314592587/3f2383004e8d4945ba672dcabccbd1ef/artifacts
+end_time: 1757449254197
+entry_point_name: ''
+experiment_id: '434473109314592587'
+lifecycle_stage: active
+run_id: 3f2383004e8d4945ba672dcabccbd1ef
+run_name: xgb_20250909_171855
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1757449137011
+status: 3
+tags: []
+user_id: mahno

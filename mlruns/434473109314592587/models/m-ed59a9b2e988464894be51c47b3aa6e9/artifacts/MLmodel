@@ -1,0 +1,85 @@
+artifact_path: file:///C:/Users/mahno/Git/PS_IA/mlruns/434473109314592587/models/m-ed59a9b2e988464894be51c47b3aa6e9/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.11.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.1
+is_signature_from_type_hint: false
+mlflow_version: 3.3.2
+model_id: m-ed59a9b2e988464894be51c47b3aa6e9
+model_size_bytes: 2676405
+model_uuid: m-ed59a9b2e988464894be51c47b3aa6e9
+prompts: null
+run_id: f5ca1611f3df4a9eb4af01013b6ac8d7
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "long", "name": "match_nivel_academico", "required": true}, {"type":
+    "double", "name": "overlap_skills", "required": true}, {"type": "double", "name":
+    "sim_cv_vaga", "required": true}, {"type": "string", "name": "beneficios.valor_compra_1",
+    "required": true}, {"type": "double", "name": "beneficios.valor_compra_2", "required":
+    false}, {"type": "string", "name": "beneficios.valor_venda", "required": true},
+    {"type": "double", "name": "formacao_e_idiomas.ano_conclusao", "required": false},
+    {"type": "string", "name": "formacao_e_idiomas.cursos", "required": false}, {"type":
+    "double", "name": "formacao_e_idiomas.instituicao_ensino_superior", "required":
+    false}, {"type": "string", "name": "formacao_e_idiomas.nivel_academico", "required":
+    false}, {"type": "string", "name": "formacao_e_idiomas.nivel_espanhol", "required":
+    false}, {"type": "string", "name": "formacao_e_idiomas.nivel_ingles", "required":
+    false}, {"type": "string", "name": "formacao_e_idiomas.outro_idioma", "required":
+    true}, {"type": "string", "name": "informacoes_basicas.cliente", "required": true},
+    {"type": "string", "name": "informacoes_basicas.empresa_divisao", "required":
+    true}, {"type": "string", "name": "informacoes_basicas.limite_esperado_para_contratacao",
+    "required": true}, {"type": "string", "name": "informacoes_basicas.objetivo_vaga",
+    "required": false}, {"type": "double", "name": "informacoes_basicas.origem_vaga",
+    "required": false}, {"type": "double", "name": "informacoes_basicas.prazo_contratacao",
+    "required": false}, {"type": "double", "name": "informacoes_basicas.prioridade_vaga",
+    "required": false}, {"type": "string", "name": "informacoes_basicas.tipo_contratacao",
+    "required": true}, {"type": "string", "name": "informacoes_basicas.titulo_vaga",
+    "required": true}, {"type": "string", "name": "informacoes_basicas.vaga_sap",
+    "required": true}, {"type": "double", "name": "informacoes_pessoais.download_cv",
+    "required": false}, {"type": "string", "name": "informacoes_profissionais.area_atuacao",
+    "required": false}, {"type": "string", "name": "informacoes_profissionais.certificacoes",
+    "required": false}, {"type": "double", "name": "informacoes_profissionais.conhecimentos_tecnicos",
+    "required": false}, {"type": "double", "name": "informacoes_profissionais.nivel_profissional",
+    "required": false}, {"type": "double", "name": "informacoes_profissionais.outras_certificacoes",
+    "required": false}, {"type": "string", "name": "informacoes_profissionais.remuneracao",
+    "required": false}, {"type": "string", "name": "informacoes_profissionais.titulo_profissional",
+    "required": false}, {"type": "string", "name": "infos_basicas.local", "required":
+    false}, {"type": "double", "name": "modalidade", "required": false}, {"type":
+    "string", "name": "perfil_vaga.areas_atuacao", "required": true}, {"type": "double",
+    "name": "perfil_vaga.bairro", "required": false}, {"type": "string", "name": "perfil_vaga.cidade",
+    "required": true}, {"type": "string", "name": "perfil_vaga.equipamentos_necessarios",
+    "required": false}, {"type": "string", "name": "perfil_vaga.estado", "required":
+    true}, {"type": "string", "name": "perfil_vaga.faixa_etaria", "required": true},
+    {"type": "string", "name": "perfil_vaga.habilidades_comportamentais_necessarias",
+    "required": false}, {"type": "double", "name": "perfil_vaga.horario_trabalho",
+    "required": false}, {"type": "long", "name": "perfil_vaga.local_trabalho", "required":
+    true}, {"type": "string", "name": "perfil_vaga.nivel profissional", "required":
+    true}, {"type": "string", "name": "perfil_vaga.nivel_academico", "required": true},
+    {"type": "string", "name": "perfil_vaga.nivel_espanhol", "required": true}, {"type":
+    "string", "name": "perfil_vaga.nivel_ingles", "required": true}, {"type": "double",
+    "name": "perfil_vaga.outro_idioma", "required": false}, {"type": "double", "name":
+    "perfil_vaga.regiao", "required": false}, {"type": "string", "name": "perfil_vaga.vaga_especifica_para_pcd",
+    "required": true}, {"type": "string", "name": "perfil_vaga.viagens_requeridas",
+    "required": false}, {"type": "string", "name": "titulo_vaga", "required": true},
+    {"type": "string", "name": "cv_pt", "required": true}, {"type": "string", "name":
+    "infos_basicas.objetivo_profissional", "required": false}, {"type": "string",
+    "name": "perfil_vaga.competencia_tecnicas_e_comportamentais", "required": true},
+    {"type": "string", "name": "perfil_vaga.demais_observacoes", "required": true},
+    {"type": "string", "name": "perfil_vaga.principais_atividades", "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "float32", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-09-03 19:41:36.604651'

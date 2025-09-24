@@ -5,11 +5,6 @@ data/processed/*
 !data/processed/feature_map.json
 data/interim/
 
-# Artefatos de modelo
-models/
-*.pkl
-*.joblib
-mlruns/
 
 
 # Ambiente virtual

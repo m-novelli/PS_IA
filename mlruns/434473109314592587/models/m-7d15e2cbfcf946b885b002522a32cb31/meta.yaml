@@ -1,0 +1,10 @@
+artifact_location: file:///C:/Users/mahno/Git/PS_IA/mlruns/434473109314592587/models/m-7d15e2cbfcf946b885b002522a32cb31/artifacts
+creation_timestamp: 1756927169179
+experiment_id: '434473109314592587'
+last_updated_timestamp: 1756927184034
+model_id: m-7d15e2cbfcf946b885b002522a32cb31
+model_type: null
+name: model
+source_run_id: 7658334c320c428f96f7af20c109251d
+status: 2
+status_message: null

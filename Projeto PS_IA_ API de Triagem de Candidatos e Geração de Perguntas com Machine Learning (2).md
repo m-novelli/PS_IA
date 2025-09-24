@@ -255,18 +255,17 @@ Durante o treinamento, o modelo é avaliado em um conjunto de dados de *holdout*
 **Exemplo de `classification_report` (valores ilustrativos):**
 
 ```
-               precision    recall  f1-score   support
+              precision    recall  f1-score   support
 
-           0      0.417     0.696     0.521      1899
-           1      0.802     0.558     0.659      4194
+           0       0.85      0.92      0.88      1000
+           1       0.78      0.65      0.71       200
 
-    accuracy                          0.601      6093
-   macro avg      0.609     0.627     0.590      6093
-weighted avg      0.682     0.601     0.616      6093
-
+    accuracy                           0.84      1200
+   macro avg       0.81      0.78      0.80      1200
+weighted avg       0.84      0.84      0.84      1200
 ```
 
-*   **Precision (Precisão)**: A proporção de identificações positivas que estavam corretas. Para a classe `1` (candidato avança), uma precisão de 0.80 significa que 808% dos candidatos classificados como "avançar" realmente avançaram.
+*   **Precision (Precisão)**: A proporção de identificações positivas que estavam corretas. Para a classe `1` (candidato avança), uma precisão de 0.78 significa que 78% dos candidatos classificados como "avançar" realmente avançaram.
 *   **Recall (Revocação/Sensibilidade)**: A proporção de positivos reais que foram identificados corretamente. Para a classe `1`, um recall de 0.65 indica que o modelo identificou 65% de todos os candidatos que deveriam avançar.
 *   **F1-Score**: A média harmônica da precisão e do recall. É uma métrica útil quando há um desequilíbrio de classes, fornecendo um equilíbrio entre precisão e recall.
 *   **Support**: O número de ocorrências reais de cada classe no conjunto de teste.
@@ -295,12 +294,10 @@ O projeto conta com uma suíte de testes abrangente (`tests/`) utilizando `pytes
 *   **Testes de Pipeline de ML**: Garantia da correta construção e funcionamento do pipeline de treinamento.
 *   **Testes de LLM**: Validação da integração e saída da geração de perguntas.
 
-## Limitações & Próximos Passos 
+## 🤝 Contribuição
 
-    * Texto: TF-IDF é bag-of-words; próximo passo razoável: embeddings (SBERT) e re-rankers.
+Instruções sobre como contribuir para o projeto (se aplicável).
 
-    * Calibração: avaliar Brier e calibradores (Platt/Isotonic) para thresholds estáveis.
+## 📄 Licença
 
-    * Fairness/PII: auditoria sistemática de vieses e reforço de controles.
-
-    * MLOps: model registry, shadow deploy, alertas automáticos de drift.
+Informações sobre a licença do projeto.
