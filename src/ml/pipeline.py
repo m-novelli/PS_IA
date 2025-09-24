@@ -36,7 +36,7 @@ def build_pipeline(cat_cols: List[str], txt_cols: List[str]) -> Pipeline:
     # 1) coerção de tipos para entrada crua
     coerce = TypeCoercionTransformer(cat_cols=cat_cols, txt_cols=txt_cols)
 
-    # 2) features engenheiradas (iguais ao seu FE)
+    # 2) features engenheiradas 
     num_features = FeatureUnion([
         ("match_nivel_academico", MatchNivelAcademicoEqTransformer()),
         ("overlap_skills",        OverlapSkillsJaccardTransformer()),
