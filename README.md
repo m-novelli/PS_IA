@@ -80,8 +80,8 @@ Para que o professor possa analisar e executar o projeto, siga os passos abaixo:
 
 3.  **Crie e ative o ambiente virtual e instale as dependências:**
     ```bash
-uv sync
-source .venv/bin/activate
+    uv sync
+    source .venv/bin/activate
     ```
     *(Alternativamente, use `python -m venv .venv` e `pip install -r requirements.txt`)*
 
@@ -90,7 +90,7 @@ source .venv/bin/activate
 Para replicar o ambiente de treinamento, você precisará dos dados. O projeto original usava `curl` para baixar arquivos zip do Google Drive. Adapte conforme a disponibilidade dos dados:
 
 ```bash
-# Exemplo de download (ajuste os links conforme necessário)
+# Links para download
 curl -L "https://drive.google.com/uc?export=download&id=1h8Lk5LM8VE5TF80mngCcbsQ14qA2rbw_" -o data/raw/vagas.zip
 curl -L "https://drive.google.com/uc?export=download&id=1Z0dOk8FMjazQo03PuUeNGZOW-rxtpzmO" -o data/raw/applicants.zip
 curl -L "https://drive.google.com/uc?export=download&id=1-hNfS7Z01fMM_JnT2K-zQrOoGm_C-jUT" -o data/raw/prospects.zip
