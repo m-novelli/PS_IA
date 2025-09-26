@@ -56,7 +56,8 @@ def load_artifacts() -> None:
     if not META_PATH.exists():
         logger.exception("artifacts_load_failed", meta_path=str(META_PATH), reason="meta_missing")
         raise RuntimeError(f"Metadados não encontrados: {META_PATH}")
-
+    logger.info(f"Modelo encontrado: {MODEL_PATH}")
+    logger.info(f"Metadados encontrado: {META_PATH}")
     MODEL = load(MODEL_PATH)
     META  = json.loads(META_PATH.read_text(encoding="utf-8"))
 

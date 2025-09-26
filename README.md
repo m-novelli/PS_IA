@@ -95,9 +95,14 @@ Caso os dados brutos não estejam disponíveis, você pode baixá-los:
 ```bash
 # Exemplo de download 
 curl -L "https://drive.google.com/uc?export=download&id=1h8Lk5LM8VE5TF80mngCcbsQ14qA2rbw_" -o data/raw/vagas.zip
+unzip data/raw/vagas.zip -d data/raw/
 curl -L "https://drive.google.com/uc?export=download&id=1Z0dOk8FMjazQo03PuUeNGZOW-rxtpzmO" -o data/raw/applicants.zip
+unzip data/raw/applicants.zip -d data/raw/
 curl -L "https://drive.google.com/uc?export=download&id=1-hNfS7Z01fMM_JnT2K-zQrOoGm_C-jUT" -o data/raw/prospects.zip
+unzip data/raw/prospects.zip -d data/raw/
 ```
+
+Os arquivos estão disponiveis no Google Drive, o link está em data/raw/links.txt.
 
 Após o download, descompacte os arquivos zip para o diretório `data/raw/`.
 
@@ -132,14 +137,7 @@ Este script irá:
 
 ### 3. Iniciar a API
 
-Defina as variáveis de ambiente necessárias (especialmente `OPENAI_API_KEY` se for usar a funcionalidade de LLM) e inicie a aplicação FastAPI:
-
 ```bash
-export OPENAI_API_KEY="sua_chave_openai"
-# Outras variáveis de ambiente opcionais:
-# export THRESHOLD_DEFAULT="0.60"
-# export SHOW_WARNINGS="full"
-
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 

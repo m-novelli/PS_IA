@@ -164,9 +164,16 @@ def main():
     # ================================
     # MLflow (tracking local opcional)
     # ================================
-    mlruns_path = "file:" + str((BASE_DIR / "mlruns").resolve())
-    mlflow.set_tracking_uri(mlruns_path)
-    mlflow.set_experiment("triagem-candidatos")
+    # Import the robust MLflow configuration
+    import sys
+    sys.path.append(str(BASE_DIR / "src" / "ml"))
+    from mlflow_config import setup_mlflow_tracking
+    
+    setup_mlflow_tracking(
+        base_dir=BASE_DIR,
+        experiment_name="triagem-candidatos",
+        force_clean=True
+    )
 
     run_name = f"xgb_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     with mlflow.start_run(run_name=run_name) as run:

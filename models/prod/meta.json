@@ -51,8 +51,7 @@
       "perfil_vaga.outro_idioma",
       "perfil_vaga.regiao",
       "perfil_vaga.vaga_especifica_para_pcd",
-      "perfil_vaga.viagens_requeridas",
-      "titulo_vaga"
+      "perfil_vaga.viagens_requeridas"
     ],
     "txt": [
       "cv_pt",
@@ -78,9 +77,9 @@
   },
   "scale_pos_weight": 0.42928774240318973,
   "metrics_holdout": {
-    "roc_auc": 0.6691753283295704,
-    "pr_auc": 0.8063714069985704,
-    "f1": 0.6585125825952481
+    "roc_auc": 0.6741827325226766,
+    "pr_auc": 0.8092669084708892,
+    "f1": 0.6637603712558009
   },
   "primary_metric": "pr_auc",
   "split": {
@@ -92,6 +91,6 @@
   "default_threshold": 0.6,
   "mlflow": {
     "experiment": "triagem-candidatos",
-    "run_id": "95bf626761804faabf42fe62511f4225"
+    "run_id": "610342b069bb46478a91d3108c24f25a"
   }
 }

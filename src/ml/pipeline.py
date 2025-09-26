@@ -9,7 +9,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from xgboost import XGBClassifier
 
-from src.ml.transformers import (
+from train_transformers import (
     TypeCoercionTransformer,
     MatchNivelAcademicoEqTransformer,
     OverlapSkillsJaccardTransformer,

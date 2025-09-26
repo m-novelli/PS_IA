@@ -14,7 +14,8 @@ import mlflow
 import mlflow.sklearn
 from mlflow.models.signature import infer_signature
 
-from src.ml.pipeline import build_pipeline
+from pipeline import build_pipeline
+from mlflow_config import setup_mlflow_tracking, safe_log_dict
 
 # ====== Paths / Config ======
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -46,7 +47,8 @@ CAT_COLS = [
     "perfil_vaga.horario_trabalho","perfil_vaga.local_trabalho","perfil_vaga.nivel profissional",
     "perfil_vaga.nivel_academico","perfil_vaga.nivel_espanhol","perfil_vaga.nivel_ingles",
     "perfil_vaga.outro_idioma","perfil_vaga.regiao","perfil_vaga.vaga_especifica_para_pcd",
-    "perfil_vaga.viagens_requeridas","titulo_vaga"
+    "perfil_vaga.viagens_requeridas"
+    # ,"titulo_vaga"
 ]
 TXT_COLS = [
     "cv_pt",
