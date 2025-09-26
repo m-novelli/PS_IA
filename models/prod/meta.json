@@ -77,9 +77,9 @@
   },
   "scale_pos_weight": 0.42928774240318973,
   "metrics_holdout": {
-    "roc_auc": 0.6741827325226766,
-    "pr_auc": 0.8092669084708892,
-    "f1": 0.6637603712558009
+    "roc_auc": 0.6741434326677973,
+    "pr_auc": 0.8091722967289451,
+    "f1": 0.6699205131780783
   },
   "primary_metric": "pr_auc",
   "split": {
@@ -91,6 +91,6 @@
   "default_threshold": 0.6,
   "mlflow": {
     "experiment": "triagem-candidatos",
-    "run_id": "610342b069bb46478a91d3108c24f25a"
+    "run_id": "9eecce6fc92b4e10926d01d0d0ba1f6f"
   }
 }

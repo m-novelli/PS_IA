@@ -7,11 +7,19 @@ from joblib import load
 import pandas as pd
 import json, os, hashlib, datetime as dt
 
-# (Opcional) OpenAI: geração de perguntas
 from .suggest import suggest_questions, SuggestQuestionsRequest, SuggestQuestionsResponse
 
 # Logging estruturado (adição sem alterar a API)
 from .logging_config import logger, safe_hash_obj
+
+import sys
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+ML_DIR = BASE_DIR / "src" / "ml"
+if str(ML_DIR) not in sys.path:
+    sys.path.insert(0, str(ML_DIR))
+
 
 router = APIRouter()
 
