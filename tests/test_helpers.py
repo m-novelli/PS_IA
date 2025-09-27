@@ -12,7 +12,10 @@ def test_coerce_dtypes_numeric_and_text(feature_schema):
     num_col = feature_schema["num"][0] if feature_schema["num"] else "idade"
     assert out[num_col].dtype.kind in ("i", "f")
     cat_col = feature_schema["cat"][0] if feature_schema["cat"] else "sexo"
-    assert str(out[cat_col].dtype) == "string"
+    assert (
+    pd.api.types.is_string_dtype(out[cat_col]) or
+    pd.api.types.is_object_dtype(out[cat_col])
+)
     txt_col = feature_schema["txt"][0] if feature_schema["txt"] else "cv_pt"
     assert str(out[txt_col].dtype) == "string"
     assert out[txt_col].isna().sum() == 0

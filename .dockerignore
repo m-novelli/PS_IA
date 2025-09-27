@@ -1,0 +1,29 @@
+# --- Ignorar arquivos que não precisam ir para a imagem ---
+.git
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.swp
+*.ipynb_checkpoints
+.venv/
+.env
+.env.*
+
+# Dados locais / artefatos pesados
+data/
+notebooks/
+artifacts/
+reports/
+*.png
+*.csv
+
+# Caches de testes/cobertura
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Exemplos de arquivos grandes que não precisa copiar:
+models/baseline_pipeline.joblib
+models/confusion_matrix.png
+models/baseline_meta.json

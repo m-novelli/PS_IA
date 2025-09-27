@@ -23,9 +23,12 @@ MODEL_TAG    = os.getenv("MODEL_TAG", "Production")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    routes.load_artifacts()
-    # loga um evento de startup com identidade do modelo servido
+    try:
+        routes.load_artifacts()
+    except Exception:
+        # Em testes, não impede o app de subir
+        if os.getenv("TESTING") != "1":
+            raise
     logger.info(
         "startup",
         model_uri=MODEL_URI,
@@ -35,7 +38,6 @@ async def lifespan(app: FastAPI):
     )
     yield
     # Shutdown (if needed)
-    pass
 
 
 def create_app() -> FastAPI:

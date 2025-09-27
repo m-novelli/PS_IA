@@ -130,3 +130,66 @@ def test_suggest_questions_online_path_with_mock(monkeypatch):
     assert isinstance(resp, SuggestQuestionsResponse)
     assert resp.common_questions == ["Qual sua experiência com Spark?"]
     assert resp.per_candidate["c99"] == ["Qual sua experiência com Spark?"]
+
+
+# tests/test_routes_rank_happy_paths.py
+import numpy as np
+
+def _install_dummy_model(routes, prob=0.7):
+    class Dummy:
+        def predict_proba(self, X):
+            return np.c_[1-np.full((len(X),), prob), np.full((len(X),), prob)]
+    routes.MODEL = Dummy()
+
+def test_rank_and_suggest_with_questions_and_topk(client, monkeypatch):
+    import app.routes as routes
+    monkeypatch.setenv("TESTING", "0")  # usa caminho produção do prepare/warnings
+
+    # META/schema e modelo
+    routes.META = {"schema_in": {"cat": [], "txt": []}}
+    routes.CAT_COLS[:] = []
+    routes.TXT_COLS[:] = []
+    _install_dummy_model(routes, prob=0.8)
+
+    # mock de suggest_questions
+    def fake_suggest(req):
+        return type("R", (), {"dict": lambda self=None: {"common_questions": ["Q1"], "per_candidate": {"c1": ["Q2"]}}})()
+    monkeypatch.setattr(routes, "suggest_questions", fake_suggest)
+
+    payload = {
+        "vaga": {"descricao": "Eng Dados"},
+        "candidatos": [
+            {"meta": {"external_id": "c1"}, "candidato": {"cv_pt": "texto1"}},
+            {"meta": {"external_id": "c2"}, "candidato": {"cv_pt": "texto2"}},
+            {"meta": {"external_id": "c3"}, "candidato": {"cv_pt": "texto3"}},
+        ],
+    }
+    r = client.post("/rank-and-suggest?top_k=2&include_questions=true", json=payload)
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["results"]) == 2                  # cortou top_k
+    assert body["questions"]["common_questions"]      # incluiu perguntas
+
+# tests/test_suggest_json_fallback.py
+from app import suggest
+
+def test_online_path_bad_json(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "fake")
+    monkeypatch.delenv("TESTING", raising=False)
+
+    class FakeChoice: 
+        def __init__(self): 
+            self.message = type("m",(object,),{"content": "não-json"})()
+    class FakeCompletion: choices = [FakeChoice()]
+    class FakeCompletions: 
+        def create(self,*a,**k): return FakeCompletion()
+    class FakeChat: 
+        def __init__(self): self.completions = FakeCompletions()
+    class FakeClient:
+        @property
+        def chat(self): return FakeChat()
+
+    monkeypatch.setattr(suggest, "OpenAI", lambda *a, **k: FakeClient())
+    req = suggest.SuggestQuestionsRequest(vaga={"descricao":"x"}, candidatos=[{"external_id":"c1","cv":"y"}])
+    resp = suggest.suggest_questions(req)
+    assert "c1" in resp.per_candidate  # cai no fallback

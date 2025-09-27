@@ -68,6 +68,53 @@ def test_rank_and_suggest_generic_exception(monkeypatch, client):
         "vaga": {"descricao": "Engenheiro de Dados"},
         "candidatos": [{"meta": {"external_id": "cand1"}, "candidato": {"skill": "SQL"}}],
     }
-    resp = client.post("/rank-and-suggest", json=payload)
+    resp = client.post("/rank-and-suggest?include_questions=true", json=payload)
     assert resp.status_code == 400
     assert "falha simulada" in resp.json()["detail"]
+
+
+# tests/test_routes_prepare_df_errors.py
+import pytest
+
+def test_prepare_dataframe_requires_meta(monkeypatch):
+    monkeypatch.setenv("TESTING", "0")
+    import app.routes as routes
+    routes.META = None
+    with pytest.raises(RuntimeError, match="Artefatos não carregados"):
+        routes._prepare_dataframe([routes.PredictItem(meta=None, features={"a": 1})])
+
+def test_prepare_dataframe_empty_schema(monkeypatch):
+    monkeypatch.setenv("TESTING", "0")
+    import app.routes as routes
+    routes.META = {"schema_in": {"cat": [], "txt": []}}
+    routes.CAT_COLS[:] = []
+    routes.TXT_COLS[:] = []
+    with pytest.raises(RuntimeError, match="Schema de entrada vazio"):
+        routes._prepare_dataframe([routes.PredictItem(meta=None, features={})])
+
+
+# tests/test_routes_predict_errors.py
+import pytest
+
+def test_predict_model_not_loaded(client, monkeypatch):
+    import app.routes as routes
+    routes.MODEL = None
+    payload = {"features": {}, "meta": {"external_id": "x"}}
+    r = client.post("/predict", json=payload)
+    assert r.status_code == 400
+    assert "Modelo não carregado" in r.text
+
+def test_predict_model_without_predict_proba(client, monkeypatch):
+    import app.routes as routes
+    class Dummy:
+        def predict(self, X): return [0]
+    routes.MODEL = Dummy()
+    # configura META/schema mínimo para preparar dataframe
+    routes.META = {"schema_in": {"cat": [], "txt": []}}
+    routes.CAT_COLS[:] = []
+    routes.TXT_COLS[:] = []
+    payload = {"features": {}, "meta": {"external_id": "x"}}
+    r = client.post("/predict", json=payload)
+    assert r.status_code == 400
+    assert "não suporta predict_proba" in r.text.lower()
+

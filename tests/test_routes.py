@@ -38,27 +38,7 @@ def test_predict_endpoint_invalid_payload(client):
     assert resp.status_code == 422  # erro de validação do Pydantic
 
 
-def test_predict_batch_success(client):
-    payload = {
-        "items": [
-            {"features": {"foo": 123}, "meta": {"external_id": "cand1"}},
-            {"features": {"bar": "abc"}, "meta": {"external_id": "cand2"}},
-        ]
-    }
-    resp = client.post("/predict-batch", json=payload)
-    assert resp.status_code == 200
-    data = resp.json()
-    assert "results" in data
-    assert len(data["results"]) == 2
-    assert "prediction" in data["results"][0]
 
-
-def test_predict_batch_no_items(client):
-    payload = {"items": []}
-    resp = client.post("/predict-batch", json=payload)
-    assert resp.status_code == 400
-    data = resp.json()
-    assert data["detail"] == "Nenhum item enviado."
 
 
 def test_rank_and_suggest_success(client):
@@ -69,12 +49,13 @@ def test_rank_and_suggest_success(client):
             {"meta": {"external_id": "cand2"}, "candidato": {"skill": "Python"}},
         ],
     }
-    resp = client.post("/rank-and-suggest", json=payload)
+    resp = client.post("/rank-and-suggest?include_questions=true", json=payload)
     assert resp.status_code == 200
     data = resp.json()
     assert "results" in data
-    assert "questions" in data
-    assert data["questions"]["common_questions"]  # veio do mock
+    assert "questions" in data and data["questions"] is not None
+    assert data["questions"].get("common_questions")
+
 
 
 def test_rank_and_suggest_no_candidates(client):

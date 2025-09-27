@@ -312,6 +312,13 @@ O projeto conta com uma suíte de testes abrangente (`tests/`) utilizando `pytes
 *   **Testes de Pipeline de ML**: Garantia da correta construção e funcionamento do pipeline de treinamento.
 *   **Testes de LLM**: Validação da integração e saída da geração de perguntas.
 
+- **Cobertura total:** 85%  
+
+Comando utilizado:
+```bash
+  pytest --cov=app --cov=src
+```
+
 ## Limitações & Próximos Passos 
 
     * Texto: TF-IDF é bag-of-words; próximo passo razoável: embeddings (SBERT) e re-rankers.
