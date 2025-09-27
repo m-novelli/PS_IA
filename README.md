@@ -141,7 +141,42 @@ Este script irá:
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Após iniciar, a API estará disponível em `http://localhost:8000`. A documentação interativa (Swagger UI) pode ser acessada em `http://localhost:8000/docs`.
+### 4. Executar com Docker
+
+Se preferir rodar a aplicação via Docker, sem precisar configurar o ambiente Python localmente, siga os passos abaixo:
+
+#### 4.1. Construir a imagem
+No diretório raiz do projeto (onde está o `Dockerfile`), execute:
+
+```bash
+docker build -t ps_ia:with-model .
+```
+Isso criará uma imagem chamada ps_ia:with-model
+
+#### 4.2. Rodar o container
+Para iniciar a aplicação, expondo a porta 8000
+```bash
+docker run -it --rm -p 8000:8000 \
+  -e OPENAI_API_KEY="sua-chave-aqui" \
+  ps_ia:with-model
+```
+OPENAI_API_KEY= necessária se quiser utilizar a feature de gerar perguntas para os candidatos
+
+#### 4.3. Usando .env
+Para não expor a chave diretamente na linha de comando, você pode criar um arquivo .env na raiz do projeto (não commitado no Git) com o seguinte conteúdo:
+```
+OPENAI_API_KEY=sua-chave-aqui
+```
+E rodar:
+```bash
+docker run -it --rm -p 8000:8000 --env-file .env ps_ia:with-model
+```
+
+A API estará disponível em:
+
+Após iniciar, a API estará disponível em `http://localhost:8000`. 
+
+A documentação interativa (Swagger UI) pode ser acessada em `http://localhost:8000/docs`.
 
 ## 📊 Principais Funcionalidades e Resultados
 
@@ -260,43 +295,6 @@ A API expõe os seguintes endpoints principais:
   }
 }
 ```
-
-### 4. Executar com Docker
-
-Se preferir rodar a aplicação via Docker, sem precisar configurar o ambiente Python localmente, siga os passos abaixo:
-
-#### 4.1. Construir a imagem
-No diretório raiz do projeto (onde está o `Dockerfile`), execute:
-
-```bash
-docker build -t ps_ia:with-model .
-```
-Isso criará uma imagem chamada ps_ia:with-model
-
-#### 4.2. Rodar o container
-Para iniciar a aplicação, expondo a porta 8000
-```bash
-docker run -it --rm -p 8000:8000 \
-  -e OPENAI_API_KEY="sua-chave-aqui" \
-  ps_ia:with-model
-```
-OPENAI_API_KEY= necessária se quiser utilizar a feature de gerar perguntas para os candidatos
-
-#### 4.3. Usando .env
-Para não expor a chave diretamente na linha de comando, você pode criar um arquivo .env na raiz do projeto (não commitado no Git) com o seguinte conteúdo:
-```
-OPENAI_API_KEY=sua-chave-aqui
-```
-E rodar:
-```bash
-docker run -it --rm -p 8000:8000 --env-file .env ps_ia:with-model
-```
-
-Após rodar o container, a API estará disponível em:
-
-Swagger UI: http://localhost:8000/docs
-
-OpenAPI JSON: http://localhost:8000/openapi.json
 
 ## Modelo de Machine Learning
 
