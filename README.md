@@ -261,7 +261,44 @@ A API expõe os seguintes endpoints principais:
 }
 ```
 
-### Modelo de Machine Learning
+### 4. Executar com Docker
+
+Se preferir rodar a aplicação via Docker, sem precisar configurar o ambiente Python localmente, siga os passos abaixo:
+
+#### 4.1. Construir a imagem
+No diretório raiz do projeto (onde está o `Dockerfile`), execute:
+
+```bash
+docker build -t ps_ia:with-model .
+```
+Isso criará uma imagem chamada ps_ia:with-model
+
+#### 4.2. Rodar o container
+Para iniciar a aplicação, expondo a porta 8000
+```bash
+docker run -it --rm -p 8000:8000 \
+  -e OPENAI_API_KEY="sua-chave-aqui" \
+  ps_ia:with-model
+```
+OPENAI_API_KEY= necessária se quiser utilizar a feature de gerar perguntas para os candidatos
+
+#### 4.3. Usando .env
+Para não expor a chave diretamente na linha de comando, você pode criar um arquivo .env na raiz do projeto (não commitado no Git) com o seguinte conteúdo:
+```
+OPENAI_API_KEY=sua-chave-aqui
+```
+E rodar:
+```bash
+docker run -it --rm -p 8000:8000 --env-file .env ps_ia:with-model
+```
+
+Após rodar o container, a API estará disponível em:
+
+Swagger UI: http://localhost:8000/docs
+
+OpenAPI JSON: http://localhost:8000/openapi.json
+
+## Modelo de Machine Learning
 
 O modelo central para a triagem de candidatos é um pipeline `scikit-learn` que incorpora um classificador **XGBoost**. A escolha do XGBoost se deu pela sua comprovada eficácia em problemas de classificação tabular, combinando alta performance, robustez a dados ruidosos e capacidade de lidar com desbalanceamento de classes (através do parâmetro `scale_pos_weight`). Ele é treinado para identificar a probabilidade de um candidato avançar para a próxima fase do processo seletivo.
 
