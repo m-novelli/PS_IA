@@ -27,7 +27,8 @@ router = APIRouter()
 # ================================
 # Artefatos
 # ================================
-PROD_DIR = BASE_DIR / "models" / "prod"
+BASE_DIR = Path(__file__).resolve().parents[0]
+PROD_DIR = BASE_DIR / "model"
 
 MODEL = None
 META: dict | None = None
